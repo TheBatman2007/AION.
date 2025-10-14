@@ -756,8 +756,45 @@
         </div>
     </div>
 
+    <div class="modal" id="osModal">
+        <div class="modal-content">
+            <h2 class="modal-title"></h2>
+            <p class="modal-subtitle"></p>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="linuxBtn"></button>
+                <button class="modal-btn secondary" id="windowsBtn"></button>
+            </div>
+        </div>
+    </div>
 
+    <div class="message-overlay hide" id="messageOverlay"></div>
 
+    <div class="message-container hide" id="messageContainer">
+        <div class="message-bubble">
+            <button class="close-btn" id="closeMsg">✕</button>
+            <div class="message-header">
+                <div class="avatar">
+                    <img src="dp.png" alt="profile">
+                </div>
+                <div class="contact-info">
+                    <div class="contact-name"></div>
+                    <div class="contact-status">
+                        <span class="status-dot"></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="message-body">
+                <div class="chat-bubble">
+                    <div class="message-content">
+                        <div class="message-text"></div>
+                        <div class="message-footer">
+                            <span class="message-time" id="messageTime"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
