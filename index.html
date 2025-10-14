@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AION AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: #ffffff;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse 1200px 600px at 10% 20%, rgba(234, 67, 53, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 1000px 500px at 90% 80%, rgba(66, 133, 244, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 800px 400px at 50% 50%, rgba(251, 188, 4, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 1100px 550px at 20% 90%, rgba(52, 168, 83, 0.1) 0%, transparent 50%);
+            animation: gradientShift 20s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.1) rotate(5deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.05) rotate(-3deg);
+                opacity: 0.9;
+            }
+        }
+
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            color: #5f5f5f;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+
+        .main-title {
+            font-size: 56px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            font-weight: 400;
+            color: #5f5f5f;
+            max-width: 700px;
+            line-height: 1.6;
+        }
+
+        .video-section {
+            width: 100%;
+            max-width: 1100px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #f5f5f5;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .video-container:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .video-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: #000;
+        }
+
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(0, 0, 0, 0.1) 0%,
+                transparent 40%,
+                rgba(0, 0, 0, 0.4) 100%
+            );
+            pointer-events: none;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 24px 28px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4), transparent);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-container:hover .controls {
+            opacity: 1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: height 0.2s ease;
+        }
+
+        .progress-bar:hover {
+            height: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ea4335 0%, #fbbc04 25%, #34a853 50%, #4285f4 100%);
+            width: 0%;
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(234, 67, 53, 0.4);
+        }
+
+        .controls-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .controls-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 3px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .time-display {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.15), 
+                0 8px 24px rgba(0, 0, 0, 0.1);
+            max-width: 480px;
+            width: 90%;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #128c7e 0%, #075e54 100%);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-contact-info {
+            flex: 1;
+        }
+
+        .modal-contact-name {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .modal-contact-status {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .modal-status-dot {
+            width: 8px;
+            height: 8px;
+            background: #25d366;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(37, 211, 102, 0.6);
+        }
+
+        .modal-body {
+            padding: 24px;
+            background: #e5ddd5;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.05) 35px, rgba(255,255,255,.05) 70px);
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-chat-bubble {
+            background: #ffffff;
+            border-radius: 12px 12px 12px 2px;
+            padding: 12px 16px;
+            max-width: 85%;
+            align-self: flex-start;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: relative;
+            animation: bubbleIn 0.3s ease-out 0.2s both;
+        }
+
+        .modal-chat-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -8px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 10px 20px 0;
+            border-color: transparent #ffffff transparent transparent;
+        }
+
+        .modal-message-text {
+            color: #303030;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .modal-message-time {
+            color: rgba(0, 0, 0, 0.45);
+            font-size: 11px;
+            text-align: right;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 32px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn.primary {
+            background: #1a73e8;
+            color: #ffffff;
+        }
+
+        .modal-btn.primary:hover {
+            background: #1665d8;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        }
+
+        .modal-btn.secondary {
+            background: #f1f3f4;
+            color: #1a1a1a;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #e8eaed;
+        }
+
+        .modal-btn:active {
+            transform: scale(0.98);
+        }
+
+        .message-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            animation: messagePopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 90%;
+        }
+
+        .message-container.hide {
+            display: none;
+        }
+
+        @keyframes messagePopIn {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.3);
+            }
+            60% {
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .message-bubble {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 0;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.15), 
+                0 8px 24px rgba(0, 0, 0, 0.1);
+            max-width: 480px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .message-header {
+            background: linear-gradient(135deg, #128c7e 0%, #075e54 100%);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .contact-status {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #25d366;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(37, 211, 102, 0.6);
+        }
+
+        .message-body {
+            padding: 24px;
+            background: #e5ddd5;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.05) 35px, rgba(255,255,255,.05) 70px);
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .chat-bubble {
+            background: #ffffff;
+            border-radius: 12px 12px 12px 2px;
+            padding: 12px 16px;
+            max-width: 85%;
+            align-self: flex-start;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: relative;
+            animation: bubbleIn 0.3s ease-out 0.3s both;
+        }
+
+        @keyframes bubbleIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .chat-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -8px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 10px 20px 0;
+            border-color: transparent #ffffff transparent transparent;
+        }
+
+        .message-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message-text {
+            color: #303030;
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .message-time {
+            color: rgba(0, 0, 0, 0.45);
+            font-size: 11px;
+        }
+
+        .message-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1999;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .message-overlay.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .close-btn:hover {
+            background: #ffffff;
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .page-wrapper {
+                padding: 40px 24px;
+            }
+
+            .main-title {
+                font-size: 36px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+            }
+
+            .header {
+                margin-bottom: 50px;
+            }
+
+            .message-container {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .message-bubble {
+                max-width: 300px;
+            }
+
+            .modal-content {
+                padding: 36px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="header">
+            <div class="badge"></div>
+            <h1 class="main-title">AION AI</h1>
+            <p class="subtitle">Experience the future of artificial intelligence with our latest innovations</p>
+        </div>
+
+        <div class="video-section">
+            <div class="video-container" id="videoContainer">
+                <div class="video-wrapper">
+                    <div class="video-overlay"></div>
+                    <video id="videoPlayer" preload="metadata">
+                        <source src="https://res.cloudinary.com/do9uclerv/video/upload/v1/VID-20251015-WA0002_u91uix.mp4" type="video/mp4">
+                    </video>
+
+                    <div class="controls">
+                        <div class="progress-bar" id="progressBar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        
+                        <div class="controls-bottom">
+                            <div class="controls-left">
+                                <button class="control-btn" id="playBtn">PLAY</button>
+                                <div class="volume-control">
+                                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
+                                </div>
+                                <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+                            </div>
+                            <button class="control-btn" id="fullscreenBtn">FULLSCREEN</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="osModal">
+        <div class="modal-content">
+            <h2 class="modal-title">Which OS do you use?</h2>
+            <p class="modal-subtitle">Help us understand your preference</p>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="linuxBtn">Linux</button>
+                <button class="modal-btn secondary" id="windowsBtn">Windows</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="message-overlay hide" id="messageOverlay"></div>
+
+    <div class="message-container hide" id="messageContainer">
+        <div class="message-bubble">
+            <button class="close-btn" id="closeMsg">✕</button>
+            <div class="message-header">
+                <div class="avatar">
+                    <img src="dp.png" alt="profile">
+                </div>
+                <div class="contact-info">
+                    <div class="contact-name">AION AI Assistant</div>
+                    <div class="contact-status">
+                        <span class="status-dot"></span>
+                        <span>online</span>
+                    </div>
+                </div>
+            </div>
+            <div class="message-body">
+                <div class="chat-bubble">
+                    <div class="message-content">
+                        <div class="message-text">not u tryna enter with Windows 💀 get that penguin energy 🐧</div>
+                        <div class="message-footer">
+                            <span class="message-time" id="messageTime">Just now</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('videoPlayer');
+        const playBtn = document.getElementById('playBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const videoContainer = document.getElementById('videoContainer');
+        const osModal = document.getElementById('osModal');
+        const linuxBtn = document.getElementById('linuxBtn');
+        const windowsBtn = document.getElementById('windowsBtn');
+        const messageContainer = document.getElementById('messageContainer');
+        const messageOverlay = document.getElementById('messageOverlay');
+        const closeMsg = document.getElementById('closeMsg');
+        const messageTime = document.getElementById('messageTime');
+        const modalTime = document.getElementById('modalTime');
+
+        let videoStarted = false;
+        let isFullscreen = false;
+
+        // Set time for modal
+        function updateTime(element) {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            element.textContent = `${displayHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+        }
+
+        // Check if in fullscreen
+        function checkFullscreen() {
+            return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+        }
+
+        // Enter fullscreen
+        function enterFullscreen() {
+            if (videoContainer.requestFullscreen) {
+                videoContainer.requestFullscreen();
+            } else if (videoContainer.webkitRequestFullscreen) {
+                videoContainer.webkitRequestFullscreen();
+            } else if (videoContainer.msRequestFullscreen) {
+                videoContainer.msRequestFullscreen();
+            }
+        }
+
+        playBtn.addEventListener('click', async () => {
+            if (!videoStarted) {
+                videoStarted = true;
+                video.volume = 0.05;
+                volumeSlider.value = 5;
+
+                try {
+                    await video.play();
+                    playBtn.textContent = 'PAUSE';
+                    
+                    // Request fullscreen on first play
+                    enterFullscreen();
+                    // Manually update button immediately
+                    setTimeout(() => {
+                        fullscreenBtn.textContent = 'EXIT';
+                        isFullscreen = true;
+                    }, 100);
+                } catch (error) {
+                    console.error('Error playing video:', error);
+                }
+            } else if (video.paused) {
+                video.play();
+                playBtn.textContent = 'PAUSE';
+            } else {
+                video.pause();
+                playBtn.textContent = 'PLAY';
+            }
+        });
+
+        linuxBtn.addEventListener('click', () => {
+            osModal.classList.remove('show');
+            videoStarted = true;
+            video.play();
+            playBtn.textContent = 'PAUSE';
+        });
+
+        windowsBtn.addEventListener('click', () => {
+            osModal.classList.remove('show');
+            messageContainer.classList.remove('hide');
+            video.pause();
+            playBtn.textContent = 'PLAY';
+        });
+
+        video.addEventListener('timeupdate', () => {
+            const percentage = (video.currentTime / video.duration) * 100;
+            progressFill.style.width = percentage + '%';
+            updateTimeDisplay();
+        });
+
+        progressBar.addEventListener('click', (e) => {
+            const rect = progressBar.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            video.currentTime = percent * video.duration;
+        });
+
+        volumeSlider.addEventListener('input', (e) => {
+            video.volume = e.target.value / 100;
+        });
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimeDisplay() {
+            timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+        }
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (checkFullscreen()) {
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            } else {
+                // Enter fullscreen
+                enterFullscreen();
+            }
+        });
+
+        // Listen for fullscreen change events
+        function updateFullscreenButton() {
+            if (checkFullscreen()) {
+                fullscreenBtn.textContent = 'EXIT';
+                isFullscreen = true;
+            } else {
+                fullscreenBtn.textContent = 'FULLSCREEN';
+                isFullscreen = false;
+            }
+        }
+
+        document.addEventListener('fullscreenchange', updateFullscreenButton);
+        document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+        document.addEventListener('msfullscreenchange', updateFullscreenButton);
+        document.addEventListener('mozfullscreenchange', updateFullscreenButton);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && e.target === document.body) {
+                e.preventDefault();
+                playBtn.click();
+            }
+        });
+
+        video.volume = 0.25;
+    </script>
+</body>
+</html>
